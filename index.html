@@ -1,0 +1,1089 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#173f35">
+  <meta name="description" content="SmartSave helps students track spending, plan budgets, build savings habits and learn financial literacy.">
+  <title>SmartSave — Money, made mindful</title>
+  <style>
+    /* =========================================================
+       SmartSave UI — theme, layout, components and responsive UI
+       ========================================================= */
+    :root {
+      color-scheme: light;
+      --ink: #1b3029;
+      --muted: #718078;
+      --line: #e3e9e3;
+      --paper: #f5f7f2;
+      --surface: #ffffff;
+      --green: #1b6b52;
+      --green-dark: #173f35;
+      --green-soft: #e4f3eb;
+      --lime: #d8f17a;
+      --blue-soft: #eaf1fb;
+      --blue: #416caa;
+      --amber-soft: #fff3d9;
+      --amber: #9a6810;
+      --red-soft: #fff0ed;
+      --red: #b64b3a;
+      --shadow: 0 12px 36px rgba(22, 54, 43, .07);
+      --radius: 20px;
+      --radius-sm: 13px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid rgba(32, 132, 93, .25); outline-offset: 2px; }
+    .hidden { display: none !important; }
+    .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+    .eyebrow { color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    .brand-mark { display: grid; place-items: center; width: 42px; height: 42px; flex: 0 0 42px; border-radius: 14px; background: var(--lime); color: var(--green-dark); font-size: 21px; font-weight: 900; }
+    .brand-name { font-size: 19px; font-weight: 850; letter-spacing: -.04em; }
+    .brand-tagline { margin-top: -3px; color: #a9c5b8; font-size: 11px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 10px 15px; border: 1px solid transparent; border-radius: 12px; font-size: 13px; font-weight: 750; transition: transform .15s ease, background .15s ease, border-color .15s ease; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: var(--green); color: white; }
+    .btn-primary:hover { background: #155740; }
+    .btn-dark { background: var(--green-dark); color: white; }
+    .btn-soft { background: var(--green-soft); color: var(--green); }
+    .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+    .btn-danger { background: var(--red-soft); color: var(--red); }
+    .btn-sm { min-height: 33px; padding: 6px 10px; border-radius: 9px; font-size: 12px; }
+    .input, input, select, textarea { width: 100%; min-width: 0; padding: 11px 12px; border: 1px solid #dce5dc; border-radius: 11px; background: #fff; color: var(--ink); }
+    input::placeholder, textarea::placeholder { color: #9aa69e; }
+    label { display: grid; gap: 6px; color: #53635a; font-size: 12px; font-weight: 750; }
+    .field-row { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    .stack { display: grid; gap: 13px; }
+    .inline-form { display: flex; align-items: end; flex-wrap: wrap; gap: 10px; }
+    .inline-form label { flex: 1 1 130px; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .panel-pad { padding: 22px; }
+    .panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 17px; }
+    .panel-head h2, .panel-head h3 { margin: 0; font-size: 17px; letter-spacing: -.025em; }
+    .panel-head p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; border-radius: 999px; background: #eff3ee; color: #637267; font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .pill.green { background: var(--green-soft); color: var(--green); }
+    .pill.amber { background: var(--amber-soft); color: var(--amber); }
+    .pill.blue { background: var(--blue-soft); color: var(--blue); }
+    .pill.red { background: var(--red-soft); color: var(--red); }
+    .progress-track { height: 8px; overflow: hidden; border-radius: 99px; background: #edf1ec; }
+    .progress-fill { height: 100%; border-radius: inherit; background: var(--green); transition: width .25s ease; }
+    .empty-state { padding: 26px 15px; text-align: center; color: var(--muted); font-size: 13px; }
+    .empty-state .emoji { display: block; margin-bottom: 8px; font-size: 27px; }
+    .section-title { margin: 0; font-size: 27px; letter-spacing: -.055em; }
+    .section-subtitle { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+
+    /* Authentication screen */
+    .auth-screen { min-height: 100vh; display: grid; grid-template-columns: minmax(0,1fr) minmax(380px,.85fr); background: #f5f7f2; }
+    .auth-story { display: flex; flex-direction: column; justify-content: space-between; min-height: 100vh; padding: clamp(28px,5vw,65px); color: white; background: radial-gradient(circle at 84% 13%, rgba(216,241,122,.16), transparent 26%), linear-gradient(145deg,#173f35 0%,#1b5946 58%,#12392f 100%); }
+    .auth-story .brand-name { color: white; }
+    .auth-main { display: grid; place-items: center; padding: 26px; }
+    .auth-card { width: min(100%, 430px); padding: clamp(24px,4vw,38px); background: white; border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 20px 70px rgba(17,53,40,.1); }
+    .auth-card h1 { margin: 0; font-size: 28px; letter-spacing: -.05em; }
+    .auth-card > p { margin: 7px 0 22px; color: var(--muted); font-size: 13px; }
+    .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 5px; margin: 18px 0; border-radius: 13px; background: #f0f4ef; }
+    .auth-tabs button { padding: 10px; border: 0; border-radius: 10px; color: var(--muted); background: transparent; font-weight: 800; font-size: 13px; }
+    .auth-tabs button.active { color: var(--green-dark); background: white; box-shadow: 0 2px 8px rgba(25,57,42,.08); }
+    .auth-alert { margin-top: 13px; padding: 11px 12px; border-radius: 11px; font-size: 12px; }
+    .auth-alert.info { color: #395b75; background: #edf5fc; }
+    .auth-alert.warn { color: #79540f; background: var(--amber-soft); }
+    .auth-alert.error { color: #9c382e; background: var(--red-soft); }
+    .auth-feature { max-width: 530px; margin: 55px 0; }
+    .auth-feature h2 { max-width: 520px; margin: 13px 0; font-size: clamp(34px,5vw,59px); line-height: 1.04; letter-spacing: -.06em; }
+    .auth-feature p { max-width: 430px; color: #c8ddd2; font-size: 15px; }
+    .auth-mini-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; max-width: 480px; }
+    .auth-mini-stats div { padding: 14px; border: 1px solid rgba(255,255,255,.13); border-radius: 15px; background: rgba(255,255,255,.05); }
+    .auth-mini-stats strong { display: block; font-size: 20px; }
+    .auth-mini-stats span { color: #b5d0c2; font-size: 11px; }
+
+    /* Main application shell */
+    .app-shell { min-height: 100vh; display: grid; grid-template-columns: 242px minmax(0,1fr); }
+    .sidebar { position: sticky; top: 0; display: flex; flex-direction: column; height: 100vh; padding: 23px 15px 16px; color: white; background: var(--green-dark); }
+    .sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 0 10px 27px; }
+    .nav-label { padding: 8px 12px 7px; color: #8eb1a0; font-size: 10px; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
+    .nav-list { display: grid; gap: 4px; }
+    .nav-link { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 41px; padding: 9px 12px; border: 0; border-radius: 11px; color: #c5d7cc; text-align: left; background: transparent; font-weight: 650; font-size: 13px; }
+    .nav-link:hover { color: white; background: rgba(255,255,255,.07); }
+    .nav-link.active { color: var(--green-dark); background: var(--lime); font-weight: 850; }
+    .nav-icon { display: inline-grid; place-items: center; width: 22px; font-size: 17px; }
+    .sidebar-spacer { flex: 1; }
+    .sidebar-footer { padding: 13px 11px 0; border-top: 1px solid rgba(255,255,255,.12); }
+    .user-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .avatar { display: grid; place-items: center; width: 35px; height: 35px; flex: 0 0 35px; border-radius: 12px; background: #315e4e; color: var(--lime); font-weight: 850; }
+    .user-meta { min-width: 0; flex: 1; }
+    .user-meta strong { display: block; overflow: hidden; max-width: 150px; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+    .user-meta span { display: block; color: #a7c5b5; font-size: 10px; }
+    .sidebar-logout { margin-top: 12px; width: 100%; color: #c4d5cb; border-color: rgba(255,255,255,.16); }
+    .main-area { min-width: 0; }
+    .topbar { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 17px clamp(18px,3vw,40px); border-bottom: 1px solid var(--line); background: rgba(245,247,242,.91); backdrop-filter: blur(16px); }
+    .topbar-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .topbar-title h1 { margin: 0; font-size: 18px; letter-spacing: -.04em; }
+    .topbar-title p { margin: 1px 0 0; font-size: 11px; color: var(--muted); }
+    .topbar-actions { display: flex; align-items: center; gap: 9px; }
+    .sync-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 99px; background: white; color: #607066; font-size: 11px; font-weight: 750; white-space: nowrap; }
+    .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #b4c1b7; }
+    .sync-dot.online { background: #23a36f; }
+    .sync-dot.waiting { background: #d69a2b; }
+    .content { width: min(1440px,100%); margin: 0 auto; padding: clamp(18px,3vw,36px); }
+    .page-heading { display: flex; align-items: end; justify-content: space-between; gap: 15px; margin-bottom: 23px; }
+    .page-heading .heading-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .grid { display: grid; gap: 18px; }
+    .grid-2 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .grid-3 { grid-template-columns: repeat(3,minmax(0,1fr)); }
+    .grid-4 { grid-template-columns: repeat(4,minmax(0,1fr)); }
+    .dashboard-layout { display: grid; grid-template-columns: minmax(0,1.45fr) minmax(280px,.8fr); gap: 18px; }
+    .metric-card { position: relative; min-width: 0; padding: 20px; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: white; }
+    .metric-card.primary { color: white; background: linear-gradient(140deg,#1b624a,#143f34); border-color: transparent; }
+    .metric-label { color: var(--muted); font-size: 12px; font-weight: 700; }
+    .metric-card.primary .metric-label, .metric-card.primary .metric-foot { color: #bdd5c9; }
+    .metric-value { margin: 9px 0 8px; font-size: clamp(22px,2.5vw,32px); font-weight: 850; letter-spacing: -.06em; overflow-wrap: anywhere; }
+    .metric-foot { color: var(--muted); font-size: 11px; }
+    .metric-symbol { position: absolute; top: 15px; right: 15px; display: grid; place-items: center; width: 35px; height: 35px; border-radius: 11px; background: #f1f5f0; }
+    .metric-card.primary .metric-symbol { background: rgba(255,255,255,.12); }
+    .list { display: grid; }
+    .list-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #edf0eb; }
+    .list-row:last-child { padding-bottom: 0; border-bottom: 0; }
+    .list-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .list-icon { display: grid; place-items: center; width: 37px; height: 37px; flex: 0 0 37px; border-radius: 12px; background: #eff4ee; }
+    .list-title { overflow: hidden; font-size: 13px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+    .list-sub { margin-top: 2px; color: var(--muted); font-size: 11px; }
+    .amount { font-size: 13px; font-weight: 850; white-space: nowrap; }
+    .amount.income { color: var(--green); }
+    .amount.expense { color: var(--red); }
+    .mini-chart { display: flex; align-items: end; gap: 10px; height: 145px; padding: 13px 0 0; }
+    .chart-col { display: flex; flex: 1; flex-direction: column; align-items: center; gap: 7px; height: 100%; justify-content: end; }
+    .chart-bar-wrap { display: flex; align-items: end; justify-content: center; width: 100%; height: calc(100% - 19px); }
+    .chart-bar { min-height: 4px; width: min(33px,70%); border-radius: 7px 7px 3px 3px; background: #6bb88d; }
+    .chart-label { color: var(--muted); font-size: 10px; }
+    .budget-row { display: grid; gap: 8px; padding: 13px 0; border-bottom: 1px solid #edf0eb; }
+    .budget-row:last-child { border-bottom: 0; }
+    .budget-row-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; }
+    .budget-row-top strong { font-size: 12px; }
+    .budget-row-top span { color: var(--muted); }
+    .goal-card, .learn-card, .challenge-card, .investment-card { display: flex; flex-direction: column; gap: 12px; padding: 19px; border: 1px solid var(--line); border-radius: 17px; background: white; }
+    .goal-card-top, .learn-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .card-emoji { display: grid; place-items: center; width: 43px; height: 43px; flex: 0 0 43px; border-radius: 14px; background: var(--green-soft); font-size: 22px; }
+    .goal-card h3, .learn-card h3, .challenge-card h3, .investment-card h3 { margin: 0; font-size: 15px; letter-spacing: -.025em; }
+    .goal-card p, .learn-card p, .challenge-card p, .investment-card p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .goal-numbers { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; }
+    .goal-numbers strong { font-size: 13px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+    th { padding: 11px 13px; background: #f6f8f4; color: #79857d; text-align: left; font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: .07em; }
+    td { padding: 13px; border-bottom: 1px solid #edf0eb; font-size: 12px; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .table-action { padding: 5px 8px; border: 0; border-radius: 8px; color: var(--red); background: var(--red-soft); font-size: 11px; font-weight: 800; }
+    .notice { display: flex; align-items: flex-start; gap: 10px; padding: 13px 15px; border: 1px solid #d8e8db; border-radius: 13px; background: #f0f8f0; color: #456c52; font-size: 12px; }
+    .notice.warn { border-color: #f0e0b9; background: #fff8e8; color: #81621e; }
+    .notice p { margin: 0; }
+    .settings-block { padding: 19px 0; border-bottom: 1px solid #edf0eb; }
+    .settings-block:first-child { padding-top: 0; }
+    .settings-block:last-child { padding-bottom: 0; border-bottom: 0; }
+    .settings-block h3 { margin: 0 0 5px; font-size: 14px; }
+    .settings-block > p { margin: 0 0 14px; color: var(--muted); font-size: 12px; }
+    .auth-state-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #edf0eb; }
+    .auth-state-row:last-child { border-bottom: 0; }
+    .toast { position: fixed; z-index: 30; right: 22px; bottom: 22px; max-width: min(410px,calc(100vw - 32px)); padding: 13px 16px; border-radius: 13px; color: white; background: #173f35; box-shadow: 0 12px 35px rgba(0,0,0,.19); font-size: 13px; font-weight: 750; transform: translateY(14px); opacity: 0; pointer-events: none; transition: .2s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .calculator-result { margin-top: 15px; padding: 18px; border-radius: 15px; background: var(--green-soft); }
+    .calculator-result strong { display: block; margin-top: 4px; color: var(--green-dark); font-size: 27px; letter-spacing: -.05em; }
+    .sim-balance { padding: 20px; color: white; background: linear-gradient(140deg,#264e40,#142f28); border-radius: 17px; }
+    .sim-balance strong { display: block; margin-top: 5px; font-size: 30px; letter-spacing: -.05em; }
+    .asset-row { display: grid; grid-template-columns: minmax(0,1fr) auto auto; align-items: center; gap: 14px; padding: 13px 0; border-bottom: 1px solid #edf0eb; }
+    .asset-row:last-child { border-bottom: 0; }
+    .asset-row h3 { margin: 0; font-size: 13px; }
+    .asset-row p { margin: 2px 0 0; color: var(--muted); font-size: 11px; }
+    .rank-banner { display: flex; align-items: center; gap: 17px; padding: 22px; color: white; background: linear-gradient(120deg,#1b624a,#163e34); border-radius: 18px; }
+    .rank-badge { display: grid; place-items: center; width: 58px; height: 58px; flex: 0 0 58px; border-radius: 18px; background: var(--lime); color: var(--green-dark); font-size: 25px; }
+    .rank-banner h2 { margin: 0; font-size: 20px; }
+    .rank-banner p { margin: 4px 0 0; color: #c5dcd0; font-size: 12px; }
+    .mobile-bottom { display: none; }
+    .footer-note { padding: 22px 0 5px; color: #929d95; text-align: center; font-size: 10px; }
+
+    /* Simple accessible dialog used for full lesson reading. */
+    .modal-root { position: fixed; z-index: 40; inset: 0; }
+    .modal-backdrop { display: grid; place-items: center; width: 100%; height: 100%; padding: 20px; overflow-y: auto; background: rgba(12,31,24,.58); backdrop-filter: blur(5px); }
+    .modal-card { width: min(620px,100%); max-height: min(82vh,760px); overflow-y: auto; padding: clamp(20px,4vw,32px); border: 1px solid var(--line); border-radius: 22px; background: white; box-shadow: 0 24px 90px rgba(0,0,0,.24); }
+    .modal-card h2 { margin: 5px 0 12px; font-size: 25px; line-height: 1.15; letter-spacing: -.05em; }
+    .lesson-body { color: #506158; font-size: 14px; line-height: 1.85; white-space: pre-line; }
+    .modal-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+
+    @media (max-width: 1180px) {
+      .grid-4 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .dashboard-layout { grid-template-columns: minmax(0,1fr); }
+    }
+    @media (max-width: 850px) {
+      .auth-screen { grid-template-columns: 1fr; }
+      .auth-story { display: none; }
+      .auth-main { min-height: 100vh; }
+      .app-shell { display: block; }
+      .sidebar { display: none; }
+      .topbar { padding: 13px 17px; }
+      .content { padding: 19px 15px 92px; }
+      .mobile-bottom { position: fixed; z-index: 20; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: repeat(5,1fr); gap: 2px; padding: 7px 8px calc(7px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(255,255,255,.96); backdrop-filter: blur(18px); }
+      .mobile-bottom button { display: grid; justify-items: center; gap: 3px; padding: 7px 1px; border: 0; border-radius: 9px; color: #7a867d; background: transparent; font-size: 9px; font-weight: 800; }
+      .mobile-bottom button span:first-child { font-size: 18px; }
+      .mobile-bottom button.active { color: var(--green); background: var(--green-soft); }
+      .grid-3 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .sync-chip { display: none; }
+    }
+    @media (max-width: 560px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: minmax(0,1fr); }
+      .metric-card { padding: 17px; }
+      .page-heading { align-items: flex-start; flex-direction: column; }
+      .page-heading .heading-actions { width: 100%; }
+      .field-row { grid-template-columns: 1fr; }
+      .panel-pad { padding: 17px; }
+      .asset-row { grid-template-columns: minmax(0,1fr) auto; }
+      .asset-row .asset-actions { grid-column: 1/-1; display: flex; gap: 7px; }
+      .topbar-title h1 { font-size: 16px; }
+      .topbar-title p { max-width: 190px; }
+      .topbar-actions .btn { padding: 8px 10px; min-height: 37px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <!-- =======================================================
+       Local demo authentication gate. Accounts and data stay in this browser only.
+       ======================================================= -->
+  <section id="authScreen" class="auth-screen">
+    <aside class="auth-story">
+      <div class="sidebar-brand" style="padding:0">
+        <div class="brand-mark">S</div><div><div class="brand-name">SmartSave</div><div class="brand-tagline">Money, made mindful.</div></div>
+      </div>
+      <div class="auth-feature">
+        <span class="pill" style="background:rgba(216,241,122,.12);color:#d8f17a">Built for student life</span>
+        <h2>Make your money work <span style="color:#d8f17a">with you.</span></h2>
+        <p>Build everyday money habits, track where it goes, set goals and learn financial concepts at your own pace.</p>
+        <div class="auth-mini-stats">
+          <div><strong>Track</strong><span>Spending clearly</span></div>
+          <div><strong>Plan</strong><span>With purpose</span></div>
+          <div><strong>Learn</strong><span>Before deciding</span></div>
+        </div>
+      </div>
+      <p class="small" style="color:#91b4a1">Educational tools for everyday money habits. Not investment advice.</p>
+    </aside>
+    <main class="auth-main">
+      <div class="auth-card">
+        <div class="brand-mark" style="margin-bottom:18px">S</div>
+        <div class="eyebrow">Your personal money space</div>
+        <h1 id="authTitle">Welcome back</h1>
+        <p id="authSubtitle">Sign in with a local account to continue.</p>
+        <div id="authTabs" class="auth-tabs" role="tablist" aria-label="Authentication mode">
+          <button id="tabLogin" class="active" type="button" role="tab" aria-selected="true">Sign in</button>
+          <button id="tabSignup" type="button" role="tab" aria-selected="false">Create account</button>
+        </div>
+        <form id="authForm" class="stack">
+          <label id="nameField" class="hidden">Your name<input id="authName" autocomplete="name" maxlength="70" placeholder="e.g. Alex" /></label>
+          <label>Email address<input id="authEmail" type="email" autocomplete="email" required maxlength="254" placeholder="you@example.com" /></label>
+          <label>Password<input id="authPassword" type="password" autocomplete="current-password" minlength="8" required placeholder="At least 8 characters" /></label>
+          <label id="confirmPasswordField" class="hidden">Confirm password<input id="authPasswordConfirm" type="password" autocomplete="new-password" minlength="8" placeholder="Re-enter your password" /></label>
+          <button class="btn btn-primary" id="authSubmit" type="submit">Sign in</button>
+        </form>
+        
+        <div id="authAlert" class="auth-alert info" role="status">Create a local account or continue with the sample demo account. This is not secure authentication.</div>
+        <div style="display:flex;align-items:center;gap:10px;margin:19px 0;color:#a3ada5;font-size:11px"><span style="height:1px;flex:1;background:#e7ece6"></span>OR USE A SAMPLE ACCOUNT<span style="height:1px;flex:1;background:#e7ece6"></span></div>
+        <button id="demoButton" class="btn btn-dark" type="button" style="width:100%">Continue with demo account →</button>
+        <p class="small muted" style="margin:11px 0 0;text-align:center">Demo email: <strong>student@smartsave.demo</strong><br>Demo password: <strong>Student123!</strong><br>Accounts and data stay in this browser only; this is not secure authentication or cloud backup.</p>
+      </div>
+    </main>
+  </section>
+
+  <!-- Main app; shown only after login or entering demo mode. -->
+  <div id="appShell" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand"><div class="brand-mark">S</div><div><div class="brand-name">SmartSave</div><div class="brand-tagline">Money, made mindful.</div></div></div>
+      <div class="nav-label">Your money</div>
+      <nav id="desktopNav" class="nav-list" aria-label="Main navigation"></nav>
+      <div class="nav-label" style="margin-top:14px">Grow your knowledge</div>
+      <nav id="learnNav" class="nav-list" aria-label="Learning navigation"></nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-footer">
+        <div class="user-row"><div id="userAvatar" class="avatar">S</div><div class="user-meta"><strong id="userEmail">Local account</strong><span id="userModeLabel">Saved on this device</span></div></div>
+        <button class="btn btn-ghost sidebar-logout" id="sidebarExit" type="button">⇥ &nbsp; Sign out / exit</button>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-title"><div><h1 id="topbarTitle">Dashboard</h1><p id="topbarDate">Your money, at a glance.</p></div></div>
+        <div class="topbar-actions"><span id="syncChip" class="sync-chip"><span id="syncDot" class="sync-dot"></span><span id="syncText">Local only</span></span><button class="btn btn-ghost btn-sm" type="button" data-view="settings">⚙ Settings</button></div>
+      </header>
+      <div id="content" class="content" aria-live="polite"></div>
+    </main>
+    <nav id="mobileNav" class="mobile-bottom" aria-label="Mobile navigation"></nav>
+    <div id="modalRoot" class="modal-root hidden"></div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script>
+    'use strict';
+
+    /* =========================================================
+       1. LOCAL-ONLY ACCOUNT MODE
+       No backend, third-party auth provider, or cloud connection is used.
+       Local accounts are only for demonstrating the sign-in experience.
+       Do not use real/private passwords or sensitive financial information.
+       ========================================================= */
+    const LOCAL_ACCOUNTS_KEY = 'smartsave.local.accounts.v1';
+    const LOCAL_DATA_PREFIX = 'smartsave.local.user.v1.';
+    const DEMO_EMAIL = 'student@smartsave.demo';
+    const DEMO_PASSWORD = 'Student123!';
+
+    /* =========================================================
+       2. APP CONSTANTS + STATE
+       ========================================================= */
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+    const CATEGORIES = ['Food', 'Transport', 'Study', 'Shopping', 'Bills', 'Health', 'Entertainment', 'Travel', 'Other'];
+    const CATEGORY_EMOJI = {Food:'🍜',Transport:'🚌',Study:'📚',Shopping:'🛍️',Bills:'💡',Health:'🩺',Entertainment:'🎬',Travel:'🧳',Other:'✳️',Income:'💸'};
+    const NAV_MONEY = [
+      {id:'dashboard',label:'Dashboard',icon:'◫'},
+      {id:'tracker',label:'Transactions',icon:'↕'},
+      {id:'budget',label:'Budget planner',icon:'▤'},
+      {id:'goals',label:'Savings goals',icon:'◎'}
+    ];
+    const NAV_GROW = [
+      {id:'learn',label:'Money lessons',icon:'✦'},
+      {id:'explore',label:'Explore options',icon:'⌘'},
+      {id:'simulator',label:'Virtual simulator',icon:'◈'},
+      {id:'calculators',label:'Calculators',icon:'∑'},
+      {id:'challenges',label:'Challenges',icon:'⚑'},
+      {id:'progress',label:'My progress',icon:'↗'}
+    ];
+    const PAGE_TITLES = {
+      dashboard:['Dashboard','A clear picture of your money.'], tracker:['Transactions','Record income and spending in one place.'],
+      budget:['Budget planner','Give every rupee a job.'], goals:['Savings goals','Turn a goal into manageable steps.'],
+      learn:['Money lessons','Learn the basics before making decisions.'], explore:['Explore options','Understand common saving and investing concepts.'],
+      simulator:['Virtual simulator','Practise with pretend money, not real investments.'], calculators:['Calculators','Use estimates to plan your next step.'],
+      challenges:['Money challenges','Small habits, repeated consistently.'], progress:['My progress','Notice the habits you are building.'], settings:['Settings','Your profile, data and app preferences.']
+    };
+    const LESSONS = [
+      {id:'needs-wants',icon:'🧭',title:'Needs vs. wants',level:'Starter',minutes:3,desc:'Separate essentials from optional spending without guilt.',body:'A need supports everyday life, such as food, transport to class, or essential supplies. A want can add enjoyment but may be flexible. The line can depend on your circumstances. Before spending, pause and ask: “Is this essential now, or can I plan for it?” A budget is a guide, not a judgement.'},
+      {id:'emergency',icon:'🛟',title:'Emergency savings',level:'Starter',minutes:4,desc:'Why a financial cushion can make surprises easier to handle.',body:'An emergency fund is money kept available for unexpected essentials, such as urgent travel or a necessary repair. Start with a small, reachable target and build gradually. The right amount depends on your own situation. Money needed soon generally belongs somewhere accessible and low-risk, rather than in a volatile investment.'},
+      {id:'budget',icon:'🗂️',title:'Build a realistic budget',level:'Starter',minutes:4,desc:'Plan around income, fixed costs, flexible costs and goals.',body:'Start by estimating money coming in. List predictable expenses, then flexible spending and savings goals. Review your actual spending after a week or month and adjust the plan. An unrealistic budget is hard to maintain; a useful budget can change when life changes.'},
+      {id:'interest',icon:'🌱',title:'Simple vs. compound interest',level:'Core',minutes:4,desc:'Understand how interest can build over time.',body:'Simple interest is calculated on the starting principal. Compound interest is calculated on the principal plus previously added interest, when the product compounds that way. Compounding can help savings grow, but returns, rates, taxes, fees and risks vary. Calculator results are estimates, not promises.'},
+      {id:'inflation',icon:'🪙',title:'Inflation and purchasing power',level:'Core',minutes:3,desc:'Why the same amount of money may buy less over time.',body:'Inflation is a general increase in prices. When prices rise, the same amount of money may buy fewer goods and services. Comparing options means looking beyond a headline return: consider inflation, fees, taxes, risk and when you will need the money.'},
+      {id:'risk',icon:'⚖️',title:'Risk, return and time horizon',level:'Core',minutes:5,desc:'Understand why different financial products behave differently.',body:'Risk is the possibility that an outcome differs from what you expect, including losing money. Investments with higher potential returns can also have bigger losses. Time horizon means when you need the money. Before choosing a product, learn how it works, what it costs, how easily you can access the money and whether its risks suit your circumstances.'},
+      {id:'fraud',icon:'🛡️',title:'Spot financial scams',level:'Starter',minutes:3,desc:'Recognise pressure tactics and keep account details safe.',body:'Be cautious of guaranteed high returns, urgency, requests for OTPs or passwords, and offers that ask you to pay to unlock supposed profits. Verify a provider independently using official sources. Never share your authentication codes. If an offer is confusing or pushes you to act immediately, pause and seek trusted guidance.'},
+      {id:'diversification',icon:'🧺',title:'Diversification basics',level:'Core',minutes:4,desc:'Learn why spreading exposure can matter and what it cannot do.',body:'Diversification means spreading money across different investments rather than relying on one. It can reduce some company- or asset-specific risks, but it does not remove all risk or guarantee a profit. Fees, overlap, liquidity and the nature of each asset still matter.'}
+    ];
+    const OPTIONS = [
+      {id:'savings',icon:'🏦',title:'Savings account',risk:'Low risk',tone:'green',liquidity:'Usually high',desc:'A bank account for money you may need soon. Check interest rates, fees, minimum balances and the protections that apply in your country.',learning:'Useful concept: accessibility and deposit protection are different from investment-market risk.'},
+      {id:'rd',icon:'📅',title:'Recurring deposit (RD)',risk:'Low risk',tone:'green',liquidity:'Scheduled term',desc:'A bank product where you deposit a planned amount periodically for a set term. Conditions and premature-withdrawal rules vary by bank.',learning:'Useful concept: regular saving can build a habit, but compare the term and early-exit conditions.'},
+      {id:'fd',icon:'🔒',title:'Fixed deposit (FD)',risk:'Generally lower risk',tone:'green',liquidity:'Term-dependent',desc:'A deposit held for a fixed period, often at a stated rate. The actual terms, applicable protection and early-withdrawal penalties depend on the institution and jurisdiction.',learning:'Useful concept: a stated interest rate is not the same as unrestricted access to your money.'},
+      {id:'bonds',icon:'📄',title:'Bonds',risk:'Varies by issuer',tone:'amber',liquidity:'Varies',desc:'A bond is a loan to a government or company. Important concepts include credit risk, interest-rate risk, maturity and liquidity.',learning:'Useful concept: “fixed income” does not mean every bond is risk-free.'},
+      {id:'mutual-funds',icon:'🧩',title:'Mutual funds',risk:'Market risk',tone:'amber',liquidity:'Fund-dependent',desc:'A pooled investment managed according to a stated strategy. Costs, holdings, volatility and exit conditions depend on the fund.',learning:'Useful concept: understand the objective, risk label, costs and underlying holdings before investing.'},
+      {id:'index-funds',icon:'📈',title:'Index funds',risk:'Market risk',tone:'amber',liquidity:'Market/fund-dependent',desc:'A fund designed to track a market index. Returns are not guaranteed; the fund can fall when the underlying market falls.',learning:'Useful concept: diversification can reduce some specific risks, but market-wide losses remain possible.'},
+      {id:'gold',icon:'🟡',title:'Gold-related products',risk:'Price and product risk',tone:'amber',liquidity:'Product-dependent',desc:'Gold exposure can come through different products with different costs, structures, storage needs and price risks.',learning:'Useful concept: know which product you are buying; the word “gold” does not describe all its risks.'}
+    ];
+    const CHALLENGES = [
+      {id:'log-week',icon:'🧾',title:'Log your spending for 3 days',desc:'Record each purchase, even the small ones.',xp:40},
+      {id:'review-budget',icon:'🗂️',title:'Review one budget category',desc:'Compare your plan with what you have actually spent.',xp:30},
+      {id:'one-goal',icon:'🎯',title:'Set one savings goal',desc:'Give a real goal a target and a rough deadline.',xp:30},
+      {id:'learn-scams',icon:'🛡️',title:'Finish the scam-awareness lesson',desc:'Learn warning signs before you encounter a suspicious offer.',xp:40},
+      {id:'weekly-check',icon:'🔎',title:'Do a weekly money check-in',desc:'Spend five minutes reviewing your last seven days.',xp:30}
+    ];
+    const ASSETS = [
+      {id:'index',name:'Broad-market index (virtual)',symbol:'IDX',price:250,change:1.2,desc:'Illustrative market-linked asset'},
+      {id:'bond',name:'Government bond fund (virtual)',symbol:'BND',price:100,change:.3,desc:'Illustrative bond-linked asset'},
+      {id:'gold',name:'Gold-linked asset (virtual)',symbol:'GLD',price:60,change:-.5,desc:'Illustrative gold-linked asset'}
+    ];
+
+    function blankState() {
+      return {
+        version: 2,
+        profile: {name:''},
+        settings: {currency:'INR',monthlyIncome:0,monthlyBudget:0},
+        transactions: [],
+        budgets: {Food:2500,Transport:1200,Study:1500,Shopping:1000,Bills:800,Health:700,Entertainment:700,Travel:1000,Other:800},
+        goals: [],
+        completedLessons: [],
+        completedChallenges: [],
+        xp: 0,
+        simulator: {cash:50000,holdings:{},trades:[]},
+        createdAt: new Date().toISOString()
+      };
+    }
+    function demoState() {
+      const s = blankState();
+      s.profile.name = 'Demo student';
+      s.settings.monthlyIncome = 8000;
+      s.settings.monthlyBudget = 6500;
+      s.transactions = [
+        {id:uid(),type:'income',amount:8000,category:'Income',note:'Monthly allowance',date:localDate(-8)},
+        {id:uid(),type:'expense',amount:180,category:'Food',note:'Lunch on campus',date:localDate(-6)},
+        {id:uid(),type:'expense',amount:120,category:'Transport',note:'Bus and metro',date:localDate(-5)},
+        {id:uid(),type:'expense',amount:450,category:'Study',note:'Lab materials',date:localDate(-4)},
+        {id:uid(),type:'expense',amount:220,category:'Food',note:'Snacks with friends',date:localDate(-2)},
+        {id:uid(),type:'expense',amount:350,category:'Shopping',note:'Everyday essentials',date:localDate(-1)}
+      ];
+      s.goals = [
+        {id:uid(),name:'New headphones',target:3000,saved:1100,deadline:monthAheadDate(2)},
+        {id:uid(),name:'Emergency cushion',target:5000,saved:1800,deadline:monthAheadDate(5)}
+      ];
+      s.xp = 100;
+      s.completedLessons = ['needs-wants','emergency'];
+      return s;
+    }
+    function uid() { return (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `id-${Date.now()}-${Math.random().toString(16).slice(2)}`; }
+    function localDate(offsetDays = 0) { const d = new Date(); d.setDate(d.getDate() + offsetDays); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+    function monthAheadDate(months = 1) { const d = new Date(); d.setMonth(d.getMonth()+months); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+    function deepClone(value) { return JSON.parse(JSON.stringify(value)); }
+    function normaliseState(raw) {
+      const base = blankState();
+      if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return base;
+      const allowedCategories = [...CATEGORIES, 'Income'];
+      const cleanTransactions = Array.isArray(raw.transactions) ? raw.transactions.filter(t => t && typeof t === 'object' && !Array.isArray(t)).slice(0,10000).map(t => ({
+        id: typeof t.id === 'string' ? t.id.slice(0,100) : uid(),
+        type: t.type === 'income' ? 'income' : 'expense',
+        amount: Math.max(0, Number(t.amount) || 0),
+        category: allowedCategories.includes(t.category) ? t.category : 'Other',
+        note: String(t.note || '').slice(0,120),
+        date: /^\d{4}-\d{2}-\d{2}$/.test(t.date || '') ? t.date : localDate()
+      })).filter(t => t.amount > 0) : [];
+      const cleanGoals = Array.isArray(raw.goals) ? raw.goals.filter(g => g && typeof g === 'object' && !Array.isArray(g)).slice(0,1000).map(g => ({
+        id: typeof g.id === 'string' ? g.id.slice(0,100) : uid(),
+        name: String(g.name || 'Savings goal').slice(0,70),
+        target: Math.max(1, Number(g.target) || 1),
+        saved: Math.max(0, Number(g.saved) || 0),
+        deadline: /^\d{4}-\d{2}-\d{2}$/.test(g.deadline || '') ? g.deadline : ''
+      })) : [];
+      const allowedCurrency = ['INR','USD','GBP','EUR','AUD','CAD','SGD'];
+      return {
+        version: 2,
+        profile: {name: String(raw.profile?.name || '').slice(0,70)},
+        settings: {
+          currency: allowedCurrency.includes(raw.settings?.currency) ? raw.settings.currency : 'INR',
+          monthlyIncome: Math.max(0, Number(raw.settings?.monthlyIncome) || 0),
+          monthlyBudget: Math.max(0, Number(raw.settings?.monthlyBudget) || 0)
+        },
+        transactions: cleanTransactions,
+        budgets: Object.fromEntries(CATEGORIES.map(c => [c, raw.budgets && raw.budgets[c] != null && Number.isFinite(Number(raw.budgets[c])) ? Math.max(0, Number(raw.budgets[c])) : base.budgets[c]])),
+        goals: cleanGoals,
+        completedLessons: Array.isArray(raw.completedLessons) ? raw.completedLessons.filter(id => LESSONS.some(l => l.id === id)) : [],
+        completedChallenges: Array.isArray(raw.completedChallenges) ? raw.completedChallenges.filter(id => CHALLENGES.some(c => c.id === id)) : [],
+        xp: Math.max(0, Math.round(Number(raw.xp) || 0)),
+        simulator: {
+          cash: raw.simulator?.cash == null ? base.simulator.cash : Math.max(0, Number(raw.simulator.cash) || 0),
+          holdings: Object.fromEntries(ASSETS.map(a => [a.id, Math.max(0, Number(raw.simulator?.holdings?.[a.id]) || 0)])),
+          trades: Array.isArray(raw.simulator?.trades) ? raw.simulator.trades.filter(t => t && typeof t === 'object' && !Array.isArray(t)).slice(0,500).map(t=>({id:String(t.id||uid()),type:t.type==='sell'?'sell':'buy',asset:ASSETS.some(a=>a.id===t.asset)?t.asset:'index',units:Math.max(0,Number(t.units)||0),date:String(t.date||localDate())})) : []
+        },
+        createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : new Date().toISOString()
+      };
+    }
+
+    let state = blankState();
+    let currentUser = null;
+    let authMode = 'login';
+    let appMode = 'signed-out'; // signed-out | local-account | demo
+    let currentView = 'dashboard';
+    let transactionFilter = 'all';
+    let toastTimer = null;
+
+    /* =========================================================
+       3. BASIC HELPERS
+       ========================================================= */
+    function esc(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
+    function money(value) {
+      const amount = Number(value) || 0;
+      try { return new Intl.NumberFormat('en-IN', {style:'currency',currency:state.settings.currency || 'INR',minimumFractionDigits:0,maximumFractionDigits:2}).format(amount); }
+      catch { return `₹${Math.round(amount).toLocaleString('en-IN')}`; }
+    }
+    function fmtDate(value) { if (!value) return 'No date'; const d = new Date(`${value}T12:00:00`); return Number.isNaN(d.getTime()) ? value : d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); }
+    function currentMonthTx() { const month = localDate().slice(0,7); return state.transactions.filter(t => t.date.slice(0,7) === month); }
+    function sums(transactions) {
+      return transactions.reduce((result,t) => { if (t.type === 'income') result.income += t.amount; else result.expense += t.amount; return result; }, {income:0,expense:0});
+    }
+    function currentMonthStats() { const s = sums(currentMonthTx()); return {...s,savings:s.income-s.expense}; }
+    function goalPercent(goal) { return Math.min(100, Math.round((goal.saved / Math.max(goal.target,1))*100)); }
+    function activeGoalNeed() { return state.goals.reduce((sum,g) => sum + Math.max(0,g.target-g.saved),0); }
+    function rankInfo() {
+      if (state.xp >= 700) return {title:'Money Mentor',emoji:'🏆',next:1000,prev:700};
+      if (state.xp >= 350) return {title:'Money Builder',emoji:'🌿',next:700,prev:350};
+      if (state.xp >= 100) return {title:'Money Explorer',emoji:'🧭',next:350,prev:100};
+      return {title:'Money Starter',emoji:'🌱',next:100,prev:0};
+    }
+    function showToast(message) {
+      const node = $('#toast'); node.textContent = message; node.classList.add('show');
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => node.classList.remove('show'), 2800);
+    }
+    function setSyncStatus(label, type = '') {
+      $('#syncText').textContent = label; $('#syncDot').className = `sync-dot ${type}`;
+    }
+    function showAuthAlert(message, kind = 'info') {
+      const el = $('#authAlert'); el.textContent = message; el.className = `auth-alert ${kind}`;
+    }
+    function localKey() {
+      if (currentUser && (appMode === 'local-account' || appMode === 'demo')) return `${LOCAL_DATA_PREFIX}${currentUser.id}`;
+      return 'smartsave.demo.v2';
+    }
+    function storeLocal() {
+      try { localStorage.setItem(localKey(), JSON.stringify(state)); return true; }
+      catch (error) { console.warn('Local storage unavailable:', error); setSyncStatus('Memory only','waiting'); return false; }
+    }
+
+    /* =========================================================
+       4. LOCAL DEMO ACCOUNTS + PER-ACCOUNT BROWSER STORAGE
+       This is a convenience login for a student project demo, not security.
+       Account records and password hashes are editable by the browser owner.
+       ========================================================= */
+    function readLocalAccounts() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(LOCAL_ACCOUNTS_KEY) || '[]');
+        return Array.isArray(parsed) ? parsed.filter(a => a && typeof a.email === 'string' && typeof a.id === 'string') : [];
+      } catch (error) {
+        console.warn('Could not read local account records:', error);
+        return [];
+      }
+    }
+    function writeLocalAccounts(accounts) {
+      try {
+        localStorage.setItem(LOCAL_ACCOUNTS_KEY, JSON.stringify(accounts));
+        return true;
+      } catch (error) {
+        console.error('Could not save local account records:', error);
+        showAuthAlert('Browser storage is unavailable. Enable site storage and try again.', 'error');
+        return false;
+      }
+    }
+    function randomSalt() {
+      if (window.crypto && window.crypto.getRandomValues) {
+        const bytes = new Uint8Array(16);
+        window.crypto.getRandomValues(bytes);
+        return [...bytes].map(n => n.toString(16).padStart(2, '0')).join('');
+      }
+      return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+    }
+    async function localPasswordHash(salt, password) {
+      const value = `${salt}:${password}`;
+      // Use Web Crypto when available. This remains a local demo, not authentication security.
+      if (window.crypto && window.crypto.subtle && window.TextEncoder) {
+        const bytes = new TextEncoder().encode(value);
+        const digest = await window.crypto.subtle.digest('SHA-256', bytes);
+        return [...new Uint8Array(digest)].map(n => n.toString(16).padStart(2, '0')).join('');
+      }
+      // Simple compatibility fallback for restricted local-file contexts; never use for real passwords.
+      let hash = 2166136261;
+      for (let i = 0; i < value.length; i++) hash = Math.imul(hash ^ value.charCodeAt(i), 16777619);
+      return (hash >>> 0).toString(16);
+    }
+    async function ensureDemoAccount() {
+      const accounts = readLocalAccounts();
+      if (accounts.some(a => a.email.toLowerCase() === DEMO_EMAIL)) return;
+      const salt = 'smartsave-student-demo-salt';
+      const passwordHash = await localPasswordHash(salt, DEMO_PASSWORD);
+      accounts.push({id:'demo-student', email:DEMO_EMAIL, name:'SmartSave Student', salt, passwordHash, createdAt:new Date().toISOString(), isDemo:true});
+      writeLocalAccounts(accounts);
+    }
+    function renderAuthMode() {
+      const isSignup = authMode === 'signup';
+      $('#authTitle').textContent = isSignup ? 'Create a local account' : 'Welcome back';
+      $('#authSubtitle').textContent = isSignup ? 'Create a profile saved in this browser.' : 'Sign in to continue your SmartSave journey.';
+      $('#authTabs').classList.remove('hidden');
+      $('#tabLogin').classList.toggle('active', !isSignup);
+      $('#tabSignup').classList.toggle('active', isSignup);
+      $('#tabLogin').setAttribute('aria-selected', String(!isSignup));
+      $('#tabSignup').setAttribute('aria-selected', String(isSignup));
+      $('#nameField').classList.toggle('hidden', !isSignup);
+      $('#authName').required = isSignup;
+      $('#confirmPasswordField').classList.toggle('hidden', !isSignup);
+      $('#authPasswordConfirm').required = isSignup;
+      $('#authPassword').autocomplete = isSignup ? 'new-password' : 'current-password';
+      $('#authSubmit').textContent = isSignup ? 'Create local account' : 'Sign in';
+      const demoButton = $('#demoButton');
+      if (demoButton) demoButton.textContent = 'Continue with demo account →';
+      showAuthAlert('Local-only mode: accounts and data stay in this browser. This login is for demonstration, not security.', 'info');
+    }
+    function showSignedOut(message = '') {
+      authMode = 'login';
+      appMode = 'signed-out';
+      currentUser = null;
+      $('#appShell').classList.add('hidden');
+      $('#authScreen').classList.remove('hidden');
+      renderAuthMode();
+      if (message) showAuthAlert(message, 'info');
+    }
+    function openLocalAccount(user, mode = 'local-account') {
+      currentUser = user;
+      appMode = mode;
+      try {
+        const saved = localStorage.getItem(localKey());
+        if (saved) state = normaliseState(JSON.parse(saved));
+        else if (user.isDemo) {
+          // Preserve data from earlier local-demo builds when possible.
+          const legacy = localStorage.getItem('smartsave.demo.v2');
+          state = legacy ? normaliseState(JSON.parse(legacy)) : demoState();
+        } else state = blankState();
+      } catch (error) {
+        console.warn('Could not load this local account state:', error);
+        state = user.isDemo ? demoState() : blankState();
+      }
+      if (!state.profile.name) state.profile.name = String(user.name || '');
+      storeLocal();
+      currentView = 'dashboard';
+      renderShell();
+      showToast(mode === 'demo' ? 'Demo account opened. Data stays on this device.' : 'Signed in to your local account.');
+    }
+    async function handleAuthSubmit(event) {
+      event.preventDefault();
+      const email = $('#authEmail').value.trim().toLowerCase();
+      const password = $('#authPassword').value;
+      const name = $('#authName').value.trim();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showAuthAlert('Enter a valid email address.', 'error');
+        return;
+      }
+      if (password.length < 8) {
+        showAuthAlert('Use a password with at least 8 characters.', 'error');
+        return;
+      }
+      const button = $('#authSubmit');
+      button.disabled = true;
+      button.textContent = authMode === 'signup' ? 'Creating account…' : 'Signing in…';
+      try {
+        const accounts = readLocalAccounts();
+        const existing = accounts.find(a => a.email.toLowerCase() === email);
+        if (authMode === 'signup') {
+          if (!name) { showAuthAlert('Enter a display name.', 'error'); return; }
+          if ($('#authPasswordConfirm').value !== password) {
+            showAuthAlert('The passwords do not match.', 'error');
+            return;
+          }
+          if (existing) {
+            showAuthAlert('An account with this email already exists in this browser. Sign in instead.', 'error');
+            return;
+          }
+          const salt = randomSalt();
+          const account = {
+            id: `local-${Date.now().toString(36)}-${randomSalt().slice(0,8)}`,
+            email, name: name.slice(0,70), salt,
+            passwordHash: await localPasswordHash(salt, password),
+            createdAt: new Date().toISOString(), isDemo: false
+          };
+          if (!writeLocalAccounts([...accounts, account])) return;
+          openLocalAccount(account, 'local-account');
+        } else {
+          if (!existing) {
+            showAuthAlert('No local account was found for this email. Choose Create account or use the sample demo account.', 'error');
+            return;
+          }
+          const passwordHash = await localPasswordHash(existing.salt, password);
+          if (passwordHash !== existing.passwordHash) {
+            showAuthAlert('The email or password is incorrect.', 'error');
+            return;
+          }
+          openLocalAccount(existing, existing.isDemo ? 'demo' : 'local-account');
+        }
+      } catch (error) {
+        console.error('Local account operation failed:', error);
+        showAuthAlert('Could not open this local account. Check that browser storage is enabled.', 'error');
+      } finally {
+        button.disabled = false;
+        button.textContent = authMode === 'signup' ? 'Create local account' : 'Sign in';
+      }
+    }
+    function continueWithDemo() {
+      const demoUser = readLocalAccounts().find(a => a.email.toLowerCase() === DEMO_EMAIL);
+      if (!demoUser) {
+        showAuthAlert('The sample account could not be prepared. Refresh the page and try again.', 'error');
+        return;
+      }
+      openLocalAccount(demoUser, 'demo');
+    }
+    function persistState() {
+      const saved = storeLocal();
+      renderSyncMode();
+      if (!saved) showToast('Could not save. Check your browser storage settings.');
+    }
+    function renderSyncMode() {
+      if (appMode === 'demo') setSyncStatus('Demo · this device', '');
+      else if (appMode === 'local-account') setSyncStatus('Saved on this device', '');
+      else setSyncStatus('Local only', '');
+    }
+    async function exitSession() {
+      showSignedOut();
+      showToast('You have signed out. Your local account data remains on this device.');
+    }
+
+    /* =========================================================
+       5. NAVIGATION + RENDER HELPERS
+       ========================================================= */
+    function navButton(item, mobile = false) {
+      return `<button type="button" class="${mobile ? '' : 'nav-link '}${currentView===item.id?'active':''}" data-view="${item.id}" ${currentView===item.id?'aria-current="page"':''}><span class="${mobile?'':'nav-icon'}">${item.icon}</span><span>${item.label}</span></button>`;
+    }
+    function renderNavigation() {
+      $('#desktopNav').innerHTML = NAV_MONEY.map(item=>navButton(item)).join('');
+      $('#learnNav').innerHTML = NAV_GROW.map(item=>navButton(item)).join('');
+      const mobileItems = [NAV_MONEY[0],NAV_MONEY[1],NAV_MONEY[2],NAV_MONEY[3],{id:'learn',label:'Learn',icon:'✦'}];
+      $('#mobileNav').innerHTML = mobileItems.map(item=>navButton(item,true)).join('');
+      $$('#mobileNav button').forEach(button => {
+        if (button.classList.contains('active')) button.setAttribute('aria-current','page');
+        else button.removeAttribute('aria-current');
+      });
+    }
+    function renderShell() {
+      $('#appShell').classList.remove('hidden'); $('#authScreen').classList.add('hidden');
+      const title = PAGE_TITLES[currentView] || PAGE_TITLES.dashboard;
+      $('#topbarTitle').textContent = title[0]; $('#topbarDate').textContent = `${title[1]} · ${new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'})}`;
+      const userLabel = currentUser?.email || (appMode === 'demo' ? DEMO_EMAIL : 'Local account');
+      $('#userEmail').textContent = state.profile.name || userLabel;
+      $('#userAvatar').textContent = (state.profile.name || userLabel || 'S').trim().charAt(0).toUpperCase();
+      $('#userModeLabel').textContent = appMode === 'demo' ? 'Sample account · this device' : appMode === 'local-account' ? 'Local account · this device' : 'Signed out';
+      renderNavigation(); renderPage(); renderSyncMode();
+    }
+    function goTo(view) {
+      if (!PAGE_TITLES[view]) return;
+      currentView = view; renderShell(); window.scrollTo({top:0,behavior:'smooth'});
+    }
+    function pageHeading(title, subtitle, actions = '') {
+      return `<div class="page-heading"><div><h1 class="section-title">${title}</h1><p class="section-subtitle">${subtitle}</p></div>${actions ? `<div class="heading-actions">${actions}</div>` : ''}</div>`;
+    }
+    function metric(label, value, foot, icon, primary = false) {
+      return `<article class="metric-card ${primary?'primary':''}"><span class="metric-symbol">${icon}</span><div class="metric-label">${label}</div><div class="metric-value">${value}</div><div class="metric-foot">${foot}</div></article>`;
+    }
+    function emptyState(icon, message) { return `<div class="empty-state"><span class="emoji">${icon}</span>${message}</div>`; }
+    function txRows(items, limit = 100) {
+      const rows = items.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,limit);
+      if (!rows.length) return `<tr><td colspan="5">${emptyState('🧾','No transactions yet. Add your first income or expense above.')}</td></tr>`;
+      return rows.map(t=>`<tr><td>${esc(fmtDate(t.date))}</td><td><span class="list-title">${esc(t.note || t.category)}</span><div class="list-sub">${esc(t.category)}</div></td><td><span class="pill ${t.type==='income'?'green':''}">${t.type==='income'?'Income':'Expense'}</span></td><td class="amount ${t.type==='income'?'income':'expense'}">${t.type==='income'?'+':'−'}${money(t.amount)}</td><td><button class="table-action" type="button" data-act="delete-tx" data-id="${esc(t.id)}" aria-label="Delete transaction">Delete</button></td></tr>`).join('');
+    }
+    function categorySpend(monthTx = currentMonthTx()) {
+      const totals = Object.fromEntries(CATEGORIES.map(c=>[c,0]));
+      monthTx.filter(t=>t.type==='expense').forEach(t=>{ if (totals[t.category] !== undefined) totals[t.category] += t.amount; });
+      return totals;
+    }
+    function budgetRows(showInputs = false) {
+      const totals = categorySpend();
+      return CATEGORIES.map(category=>{
+        const limit = Number(state.budgets[category]) || 0, spent = totals[category] || 0;
+        const pct = limit > 0 ? Math.min(100,Math.round(spent/limit*100)) : 0;
+        const tone = limit > 0 && spent > limit ? 'red' : limit > 0 && pct >= 80 ? 'amber' : 'green';
+        return `<div class="budget-row"><div class="budget-row-top"><strong>${CATEGORY_EMOJI[category]} ${category}</strong><span>${money(spent)} / ${limit?money(limit):'No limit'}</span></div><div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${tone==='red'?'#d86c59':tone==='amber'?'#d8a442':'#4baf7d'}"></div></div>${showInputs?`<form class="inline-form" data-form="budget-limit"><input type="hidden" name="category" value="${category}"><label>Monthly limit<input type="number" name="limit" min="0" step="1" value="${limit}" aria-label="${category} monthly limit"></label><button class="btn btn-soft btn-sm" type="submit">Save limit</button></form>`:''}</div>`;
+      }).join('');
+    }
+    function recentChart() {
+      const days = Array.from({length:7},(_,i)=>{ const date = new Date(); date.setDate(date.getDate() - (6-i)); return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; });
+      const values = days.map(date=>state.transactions.filter(t=>t.type==='expense'&&t.date===date).reduce((sum,t)=>sum+t.amount,0));
+      const max = Math.max(1,...values);
+      return `<div class="mini-chart">${days.map((date,i)=>`<div class="chart-col" title="${esc(fmtDate(date))}: ${money(values[i])}"><div class="chart-bar-wrap"><div class="chart-bar" style="height:${values[i]===0?4:Math.max(7,values[i]/max*100)}%"></div></div><span class="chart-label">${new Date(date+'T12:00:00').toLocaleDateString('en-IN',{weekday:'short'})}</span></div>`).join('')}</div>`;
+    }
+    function goalCard(goal) {
+      const pct = goalPercent(goal), remaining = Math.max(0,goal.target-goal.saved);
+      return `<article class="goal-card"><div class="goal-card-top"><div class="card-emoji">🎯</div><span class="pill ${pct===100?'green':''}">${pct===100?'Completed':`${pct}% saved`}</span></div><div><h3>${esc(goal.name)}</h3><p>${goal.deadline?`Target date: ${esc(fmtDate(goal.deadline))}`:'No target date set'}</p></div><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div><div class="goal-numbers"><strong>${money(goal.saved)}</strong><span class="muted">of ${money(goal.target)}</span></div><p>${pct===100?'Great work — you reached this target!':`${money(remaining)} left to reach your goal.`}</p><form class="inline-form" data-form="contribute"><input type="hidden" name="id" value="${esc(goal.id)}"><label>Add savings<input type="number" name="amount" min="1" step="1" max="100000000" required placeholder="Amount"></label><button class="btn btn-soft btn-sm" type="submit">Add</button></form><button class="btn btn-ghost btn-sm" type="button" data-act="delete-goal" data-id="${esc(goal.id)}">Remove goal</button></article>`;
+    }
+
+    /* =========================================================
+       6. PAGE RENDERERS
+       ========================================================= */
+    function renderPage() {
+      const root = $('#content');
+      const pages = {dashboard:renderDashboard,tracker:renderTracker,budget:renderBudget,goals:renderGoals,learn:renderLearn,explore:renderExplore,simulator:renderSimulator,calculators:renderCalculators,challenges:renderChallenges,progress:renderProgress,settings:renderSettings};
+      root.innerHTML = (pages[currentView] || renderDashboard)();
+    }
+    function renderDashboard() {
+      const stats = currentMonthStats();
+      const allBalance = sums(state.transactions).income - sums(state.transactions).expense;
+      const recent = state.transactions.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+      const goals = state.goals.slice(0,3);
+      const totalBudget = state.settings.monthlyBudget || CATEGORIES.reduce((sum,c)=>sum+(Number(state.budgets[c])||0),0);
+      const spentPct = totalBudget>0 ? Math.min(100,Math.round(stats.expense/totalBudget*100)) : 0;
+      return `${pageHeading(`Hello${state.profile.name?`, ${esc(state.profile.name)}`:''} 👋`,'Your student money overview, without the guesswork.',`<button class="btn btn-primary" type="button" data-view="tracker">＋ Add transaction</button>`)}
+        <div class="grid grid-4" style="margin-bottom:18px">
+          ${metric('This month’s income',money(stats.income),'Income recorded this month','↙')}
+          ${metric('This month’s spending',money(stats.expense),'Expenses recorded this month','↗')}
+          ${metric('Monthly difference',money(stats.savings),stats.savings>=0?'Income minus spending':'Spending is above recorded income','◒',true)}
+          ${metric('All-time recorded balance',money(allBalance),'Based only on entries you logged','◫')}
+        </div>
+        <div class="dashboard-layout">
+          <div class="grid" style="align-content:start">
+            <section class="panel panel-pad"><div class="panel-head"><div><h2>Spending activity</h2><p>Your recorded expenses over the last seven days</p></div><span class="pill">7 days</span></div>${recentChart()}<div class="small muted" style="margin-top:8px">This visual uses transactions you entered. Missing entries can change the picture.</div></section>
+            <section class="panel panel-pad"><div class="panel-head"><div><h2>Recent transactions</h2><p>Your latest entries</p></div><button class="btn btn-ghost btn-sm" type="button" data-view="tracker">View all</button></div><div class="list">${recent.length?recent.map(t=>`<div class="list-row"><div class="list-left"><div class="list-icon">${CATEGORY_EMOJI[t.category]||'💸'}</div><div><div class="list-title">${esc(t.note||t.category)}</div><div class="list-sub">${esc(t.category)} · ${esc(fmtDate(t.date))}</div></div></div><div class="amount ${t.type==='income'?'income':'expense'}">${t.type==='income'?'+':'−'}${money(t.amount)}</div></div>`).join(''):emptyState('🧾','Add your first transaction to see it here.')}</div></section>
+            <section class="panel panel-pad"><div class="panel-head"><div><h2>Saving toward goals</h2><p>A little progress counts</p></div><button class="btn btn-ghost btn-sm" type="button" data-view="goals">All goals</button></div>${goals.length?`<div class="grid grid-3">${goals.map(g=>`<div><div class="list-title">${esc(g.name)}</div><div class="list-sub" style="margin:7px 0">${money(g.saved)} of ${money(g.target)}</div><div class="progress-track"><div class="progress-fill" style="width:${goalPercent(g)}%"></div></div></div>`).join('')}</div>`:emptyState('🎯','Create a goal to make saving more intentional.')}</section>
+          </div>
+          <div class="grid" style="align-content:start">
+            <section class="panel panel-pad"><div class="panel-head"><div><h2>Budget pulse</h2><p>${money(stats.expense)} spent this month</p></div><span class="pill ${spentPct>=100?'red':spentPct>=80?'amber':'green'}">${spentPct}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${spentPct}%;background:${spentPct>=100?'#d86c59':spentPct>=80?'#d8a442':'#4baf7d'}"></div></div><div class="list-row" style="margin-top:8px"><span class="muted small">Budget plan</span><strong>${totalBudget?money(totalBudget):'Not set'}</strong></div><button class="btn btn-soft" style="width:100%;margin-top:13px" type="button" data-view="budget">Review budget →</button></section>
+            <section class="panel panel-pad"><div class="panel-head"><div><h2>Keep learning</h2><p>Short lessons for real-life decisions</p></div><span class="pill green">${state.completedLessons.length}/${LESSONS.length}</span></div>${LESSONS.filter(l=>!state.completedLessons.includes(l.id)).slice(0,3).map(l=>`<div class="list-row"><div class="list-left"><div class="list-icon">${l.icon}</div><div><div class="list-title">${esc(l.title)}</div><div class="list-sub">${l.minutes} min · ${l.level}</div></div></div><button class="btn btn-ghost btn-sm" type="button" data-act="open-lesson" data-id="${l.id}">Read</button></div>`).join('')||emptyState('🌱','You’ve completed every lesson. Revisit any topic to refresh it.')}</section>
+            <div class="notice"><span>💡</span><p><strong>SmartSave tip</strong><br>Use a full week of spending records before changing your budget. Missing data can make a category appear cheaper than it is.</p></div>
+          </div>
+        </div><div class="footer-note">SmartSave is an educational planner. Figures depend on the entries you provide.</div>`;
+    }
+    function renderTracker() {
+      const list = state.transactions.slice().sort((a,b)=>b.date.localeCompare(a.date)).filter(t=>transactionFilter==='all'||t.type===transactionFilter);
+      return `${pageHeading('Transactions','Log money coming in and going out. Records can be edited by deleting and adding a corrected entry.')}
+        <section class="panel panel-pad" style="margin-bottom:18px"><div class="panel-head"><div><h2>Add a transaction</h2><p>Only add real entries when you know the amount.</p></div></div><form class="stack" data-form="transaction"><div class="field-row"><label>Transaction type<select name="type"><option value="expense">Expense</option><option value="income">Income</option></select></label><label>Amount (${esc(state.settings.currency)})<input name="amount" type="number" required min="0.01" max="100000000" step="0.01" placeholder="e.g. 250"></label></div><div class="field-row"><label>Category<select name="category">${CATEGORIES.map(c=>`<option>${c}</option>`).join('')}<option value="Income" hidden>Income</option></select></label><label>Date<input name="date" type="date" required value="${localDate()}" max="${localDate()}"></label></div><label>Note (optional)<input name="note" maxlength="120" placeholder="e.g. Monthly allowance, lunch, metro"></label><div><button class="btn btn-primary" type="submit">＋ Save transaction</button></div></form></section>
+        <section class="panel"><div class="panel-pad" style="padding-bottom:12px"><div class="panel-head"><div><h2>Transaction history</h2><p>${list.length} ${list.length===1?'entry':'entries'} shown · current month statistics use the date on each entry</p></div><select id="transactionFilter" style="width:auto" aria-label="Filter transactions"><option value="all" ${transactionFilter==='all'?'selected':''}>All types</option><option value="income" ${transactionFilter==='income'?'selected':''}>Income only</option><option value="expense" ${transactionFilter==='expense'?'selected':''}>Expenses only</option></select></div></div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Details</th><th>Type</th><th>Amount</th><th>Action</th></tr></thead><tbody>${txRows(list)}</tbody></table></div></section>`;
+    }
+    function renderBudget() {
+      const stats = currentMonthStats();
+      const totalLimit = state.settings.monthlyBudget || CATEGORIES.reduce((sum,c)=>sum+(Number(state.budgets[c])||0),0);
+      const used = totalLimit>0 ? Math.round(stats.expense/totalLimit*100) : 0;
+      return `${pageHeading('Budget planner','Set category limits and compare them with your recorded spending.')}
+        <div class="grid grid-3" style="margin-bottom:18px">${metric('Recorded spending',money(stats.expense),'This calendar month','↗')}${metric('Planned monthly limit',totalLimit?money(totalLimit):'Not set','Total category limits or your overall budget','▤')}${metric('Budget used',totalLimit?`${used}%`:'—',totalLimit?`${money(Math.max(0,totalLimit-stats.expense))} of the limit remains`:'Add category limits to compare','◎')}</div>
+        <div class="grid grid-2"><section class="panel panel-pad"><div class="panel-head"><div><h2>Category limits</h2><p>Save each limit to update your plan.</p></div></div><div>${budgetRows(true)}</div></section><section class="panel panel-pad"><div class="panel-head"><div><h2>Monthly plan</h2><p>Set an optional overall budget and planned income.</p></div></div><form class="stack" data-form="monthly-plan"><label>Expected monthly income (${esc(state.settings.currency)})<input name="income" type="number" min="0" step="1" value="${state.settings.monthlyIncome}" placeholder="e.g. 8000"></label><label>Overall monthly spending budget (${esc(state.settings.currency)})<input name="budget" type="number" min="0" step="1" value="${state.settings.monthlyBudget}" placeholder="Leave 0 to use the sum of category limits"></label><button class="btn btn-primary" type="submit">Save monthly plan</button></form><div class="notice" style="margin-top:17px"><span>🧠</span><p>Use estimates as a starting point. Compare the plan with real spending and adjust it as needed; the app does not automatically know about bills you have not entered.</p></div></section></div>`;
+    }
+    function renderGoals() {
+      return `${pageHeading('Savings goals','Break a larger target into steps you can track.')}
+        <section class="panel panel-pad" style="margin-bottom:18px"><div class="panel-head"><div><h2>Create a goal</h2><p>Examples: course materials, a trip fund or an emergency cushion.</p></div></div><form class="stack" data-form="goal-create"><div class="field-row"><label>Goal name<input name="name" maxlength="70" required placeholder="e.g. Laptop fund"></label><label>Target amount (${esc(state.settings.currency)})<input name="target" type="number" min="1" max="100000000" required step="1" placeholder="e.g. 25000"></label></div><div class="field-row"><label>Already saved (${esc(state.settings.currency)})<input name="saved" type="number" min="0" max="100000000" step="1" value="0"></label><label>Target date (optional)<input name="deadline" type="date" min="${localDate()}"></label></div><div><button class="btn btn-primary" type="submit">＋ Create savings goal</button></div></form></section>
+        <div class="panel-head"><div><h2>Your goals</h2><p>${state.goals.length} active ${state.goals.length===1?'goal':'goals'} · progress is capped at 100% in the display</p></div></div>
+        ${state.goals.length?`<div class="grid grid-3">${state.goals.map(goalCard).join('')}</div>`:`<div class="panel">${emptyState('🎯','No goals yet. Create a goal above to begin.')}</div>`}`;
+    }
+    function renderLearn() {
+      const complete = state.completedLessons.length;
+      return `${pageHeading('Money lessons','Short, beginner-friendly explanations. These lessons are educational, not personalised financial recommendations.',`<span class="pill green">${complete}/${LESSONS.length} completed</span>`)}
+        <div class="notice" style="margin-bottom:18px"><span>📘</span><p><strong>Try this flow:</strong> learn the concept, write down your questions, compare trusted sources, and avoid making a financial decision based on one short lesson.</p></div>
+        <div class="grid grid-3">${LESSONS.map(l=>{const done=state.completedLessons.includes(l.id);return `<article class="learn-card"><div class="learn-card-top"><div class="card-emoji">${l.icon}</div><span class="pill ${done?'green':''}">${done?'✓ Completed':l.level}</span></div><div><h3>${esc(l.title)}</h3><p>${esc(l.desc)}</p></div><div class="small muted">⏱ ${l.minutes} min read</div><button class="btn ${done?'btn-ghost':'btn-soft'}" type="button" data-act="open-lesson" data-id="${l.id}">${done?'Review lesson':'Read lesson →'}</button></article>`;}).join('')}</div>`;
+    }
+    function renderExplore() {
+      return `${pageHeading('Explore options','A learning library for common financial products. Understand features and risks before making any choice.')}
+        <div class="notice warn" style="margin-bottom:18px"><span>⚠️</span><p><strong>Learning only:</strong> These are general descriptions, not personal recommendations or live product offers. Terms vary by provider and country. Never assume a return is guaranteed unless you have verified the product terms and applicable protections.</p></div>
+        <div class="grid grid-3">${OPTIONS.map(o=>`<article class="investment-card"><div class="goal-card-top"><div class="card-emoji">${o.icon}</div><span class="pill ${o.tone}">${esc(o.risk)}</span></div><div><h3>${esc(o.title)}</h3><p>${esc(o.desc)}</p></div><div class="list-row"><span class="muted small">Access to money</span><strong style="font-size:11px">${esc(o.liquidity)}</strong></div><div class="notice" style="margin-top:auto"><span>💡</span><p>${esc(o.learning)}</p></div></article>`).join('')}</div>`;
+    }
+    function portfolioValue() {
+      return ASSETS.reduce((sum,a)=>sum+(state.simulator.holdings[a.id]||0)*a.price,0);
+    }
+    function renderSimulator() {
+      const portfolio = state.simulator; const value = portfolioValue();
+      return `${pageHeading('Virtual simulator','Practise buying and selling with pretend money. No real orders or market prices are used.')}
+        <div class="notice warn" style="margin-bottom:18px"><span>🧪</span><p><strong>Simulation only:</strong> starting cash and asset prices are fictional examples. Values do not update from markets, and this tool cannot predict returns or tell you what to buy.</p></div>
+        <div class="grid grid-3" style="margin-bottom:18px"><div class="sim-balance"><span class="small" style="color:#bdd5c9">Virtual cash remaining</span><strong>${money(portfolio.cash)}</strong></div><div class="metric-card"><div class="metric-label">Virtual holdings value</div><div class="metric-value">${money(value)}</div><div class="metric-foot">Based on fixed practice prices</div></div><div class="metric-card"><div class="metric-label">Total virtual value</div><div class="metric-value">${money(portfolio.cash+value)}</div><div class="metric-foot">Started with ${money(50000)} in demo funds</div></div></div>
+        <div class="grid grid-2"><section class="panel panel-pad"><div class="panel-head"><div><h2>Practice assets</h2><p>Fixed fictional prices · not market quotes</p></div></div>${ASSETS.map(a=>`<div class="asset-row"><div><h3>${esc(a.name)}</h3><p>${a.symbol} · ${money(a.price)} per unit · illustrative change ${a.change>0?'+':''}${a.change}%</p><p>Your units: ${Number(portfolio.holdings[a.id]||0).toFixed(2)}</p></div><span class="pill ${a.change>=0?'green':'red'}">${a.change>0?'+':''}${a.change}%*</span><div class="asset-actions"><button class="btn btn-soft btn-sm" type="button" data-act="trade" data-id="${a.id}" data-type="buy">Buy</button><button class="btn btn-ghost btn-sm" type="button" data-act="trade" data-id="${a.id}" data-type="sell">Sell</button></div></div>`).join('')}<p class="small muted">*Illustrative labels only; price and change are not live or time-based.</p></section>
+        <section class="panel panel-pad"><div class="panel-head"><div><h2>Portfolio snapshot</h2><p>Estimated value at the practice prices above</p></div></div>${ASSETS.map(a=>{const units=portfolio.holdings[a.id]||0;const v=units*a.price;const pct=value>0?v/value*100:0;return `<div class="budget-row"><div class="budget-row-top"><strong>${esc(a.symbol)} · ${esc(a.name.split(' (')[0])}</strong><span>${money(v)}</span></div><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div><div class="small muted">${units.toFixed(2)} units · ${pct.toFixed(1)}% of holdings</div></div>`;}).join('')}
+        <div class="settings-block"><h3>Reset practice portfolio</h3><p>Start over with the original fictional cash amount and no holdings.</p><button class="btn btn-ghost btn-sm" type="button" data-act="reset-sim">Reset simulation</button></div></section></div>
+        <section class="panel panel-pad" style="margin-top:18px"><div class="panel-head"><div><h2>Practice history</h2><p>Most recent virtual trades</p></div></div>${portfolio.trades.length?`<div class="table-wrap"><table><thead><tr><th>Date</th><th>Asset</th><th>Action</th><th>Units</th></tr></thead><tbody>${portfolio.trades.slice().reverse().slice(0,25).map(t=>{const a=ASSETS.find(x=>x.id===t.asset);return `<tr><td>${esc(fmtDate(t.date))}</td><td>${esc(a?.name||t.asset)}</td><td><span class="pill ${t.type==='buy'?'blue':'amber'}">${t.type.toUpperCase()}</span></td><td>${Number(t.units).toFixed(2)}</td></tr>`;}).join('')}</tbody></table></div>`:emptyState('🧪','Make a virtual trade to see practice history here.')}</section>`;
+    }
+    function renderCalculators() {
+      return `${pageHeading('Calculators','Simple estimates to help you think through a savings plan. Rates are inputs, not promises.')}
+        <div class="grid grid-2">
+          <section class="panel panel-pad"><div class="panel-head"><div><h2>Compound interest estimate</h2><p>Assumes a fixed annual rate and yearly compounding.</p></div><span class="pill">Estimate</span></div><form class="stack" data-form="compound"><div class="field-row"><label>Starting amount (${esc(state.settings.currency)})<input name="principal" type="number" min="0" step="1" value="1000" required></label><label>Annual rate (%)<input name="rate" type="number" min="0" max="100" step="0.1" value="5" required></label></div><label>Years<input name="years" type="number" min="1" max="80" step="1" value="5" required></label><button class="btn btn-primary" type="submit">Calculate estimate</button></form><div id="compoundResult" class="calculator-result"><span class="eyebrow">Estimated final amount</span><strong>${money(1000*Math.pow(1.05,5))}</strong><div class="small muted">Illustrative only; excludes taxes, fees, inflation and changes in rate.</div></div></section>
+          <section class="panel panel-pad"><div class="panel-head"><div><h2>Emergency fund planner</h2><p>Estimate a target based on essential monthly costs.</p></div><span class="pill">Planning</span></div><form class="stack" data-form="emergency"><label>Essential monthly costs (${esc(state.settings.currency)})<input name="costs" type="number" min="0" step="1" value="5000" required></label><label>Target number of months<select name="months"><option value="1">1 month</option><option value="3" selected>3 months</option><option value="6">6 months</option></select></label><label>Already saved (${esc(state.settings.currency)})<input name="saved" type="number" min="0" step="1" value="0" required></label><button class="btn btn-primary" type="submit">Calculate target</button></form><div id="emergencyResult" class="calculator-result"><span class="eyebrow">Target amount</span><strong>${money(15000)}</strong><div class="small muted">These are general planning examples, not a rule you must follow.</div></div></section>
+          <section class="panel panel-pad"><div class="panel-head"><div><h2>Monthly savings pace</h2><p>Estimate how much to set aside each month for a target.</p></div></div><form class="stack" data-form="goalcalc"><div class="field-row"><label>Target amount (${esc(state.settings.currency)})<input name="target" type="number" min="1" step="1" value="12000" required></label><label>Already saved (${esc(state.settings.currency)})<input name="saved" type="number" min="0" step="1" value="2000" required></label></div><label>Months to target<input name="months" type="number" min="1" max="600" step="1" value="10" required></label><button class="btn btn-primary" type="submit">Calculate monthly pace</button></form><div id="goalCalcResult" class="calculator-result"><span class="eyebrow">Monthly pace needed</span><strong>${money(1000)}</strong><div class="small muted">Assumes no interest or investment returns.</div></div></section>
+          <section class="panel panel-pad"><div class="panel-head"><div><h2>50 / 30 / 20 example</h2><p>A commonly discussed budgeting framework, not a requirement.</p></div></div><form class="stack" data-form="split"><label>Monthly take-home income (${esc(state.settings.currency)})<input name="income" type="number" min="0" step="1" value="10000" required></label><button class="btn btn-primary" type="submit">Show example split</button></form><div id="splitResult" class="stack" style="margin-top:14px"><div class="budget-row"><div class="budget-row-top"><strong>Needs · 50%</strong><span>${money(5000)}</span></div><div class="progress-track"><div class="progress-fill" style="width:50%"></div></div></div><div class="budget-row"><div class="budget-row-top"><strong>Wants · 30%</strong><span>${money(3000)}</span></div><div class="progress-track"><div class="progress-fill" style="width:30%;background:#6d95d1"></div></div></div><div class="budget-row"><div class="budget-row-top"><strong>Savings/debt · 20%</strong><span>${money(2000)}</span></div><div class="progress-track"><div class="progress-fill" style="width:20%;background:#dfb653"></div></div></div></div></section>
+        </div>`;
+    }
+    function renderChallenges() {
+      const done = state.completedChallenges;
+      return `${pageHeading('Money challenges','Try one small habit at a time. Complete each challenge once to earn SmartSave XP.',`<span class="pill green">${done.length}/${CHALLENGES.length} done</span>`)}
+        <div class="grid grid-3">${CHALLENGES.map(c=>{const completed=done.includes(c.id);return `<article class="challenge-card"><div class="goal-card-top"><div class="card-emoji">${c.icon}</div><span class="pill ${completed?'green':''}">${completed?'✓ Complete':`+${c.xp} XP`}</span></div><div><h3>${esc(c.title)}</h3><p>${esc(c.desc)}</p></div><button class="btn ${completed?'btn-ghost':'btn-soft'}" type="button" data-act="complete-challenge" data-id="${c.id}" ${completed?'disabled':''}>${completed?'Completed':'Mark complete'}</button></article>`;}).join('')}</div>
+        <div class="notice" style="margin-top:18px"><span>🌿</span><p>XP is a learning-progress marker inside this app. It has no cash value and is not an investment return.</p></div>`;
+    }
+    function renderProgress() {
+      const rank = rankInfo(); const progress = Math.min(100,Math.round((state.xp-rank.prev)/Math.max(1,rank.next-rank.prev)*100));
+      const stats = currentMonthStats(); const all = sums(state.transactions);
+      return `${pageHeading('My progress','Track consistency, not perfection.')}
+        <div class="rank-banner" style="margin-bottom:18px"><div class="rank-badge">${rank.emoji}</div><div style="flex:1"><div class="small" style="color:#c5dcd0;font-weight:800">CURRENT RANK · ${state.xp} XP</div><h2>${rank.title}</h2><p>${rank.next-state.xp>0?`${rank.next-state.xp} XP until the next rank`:'You’ve reached the top rank currently available.'}</p><div class="progress-track" style="margin-top:12px;background:rgba(255,255,255,.18)"><div class="progress-fill" style="width:${progress}%;background:#d8f17a"></div></div></div></div>
+        <div class="grid grid-3" style="margin-bottom:18px">${metric('Lessons completed',`${state.completedLessons.length}/${LESSONS.length}`,'Money knowledge progress','📘')}${metric('Challenges completed',`${state.completedChallenges.length}/${CHALLENGES.length}`,'Habits tried','⚑')}${metric('Savings goals',`${state.goals.filter(g=>g.saved>=g.target).length}/${state.goals.length}`,'Targets reached','🎯')}</div>
+        <div class="grid grid-2"><section class="panel panel-pad"><div class="panel-head"><div><h2>Learning achievements</h2><p>Complete lessons and challenges to build experience.</p></div></div><div class="list-row"><div class="list-left"><div class="list-icon">📖</div><div><div class="list-title">Curious learner</div><div class="list-sub">Complete your first lesson</div></div></div><span class="pill ${state.completedLessons.length?'green':''}">${state.completedLessons.length?'Unlocked':'Locked'}</span></div><div class="list-row"><div class="list-left"><div class="list-icon">⚑</div><div><div class="list-title">Habit starter</div><div class="list-sub">Complete your first challenge</div></div></div><span class="pill ${state.completedChallenges.length?'green':''}">${state.completedChallenges.length?'Unlocked':'Locked'}</span></div><div class="list-row"><div class="list-left"><div class="list-icon">🎯</div><div><div class="list-title">Goal setter</div><div class="list-sub">Create a savings goal</div></div></div><span class="pill ${state.goals.length?'green':''}">${state.goals.length?'Unlocked':'Locked'}</span></div></section>
+        <section class="panel panel-pad"><div class="panel-head"><div><h2>Money summary</h2><p>Calculated from records you entered.</p></div></div><div class="list-row"><span class="muted">All-time income logged</span><strong>${money(all.income)}</strong></div><div class="list-row"><span class="muted">All-time expenses logged</span><strong>${money(all.expense)}</strong></div><div class="list-row"><span class="muted">This month saved/difference</span><strong style="color:${stats.savings>=0?'var(--green)':'var(--red)'}">${money(stats.savings)}</strong></div><div class="list-row"><span class="muted">Data records</span><strong>${state.transactions.length} transactions</strong></div><p class="small muted" style="margin-top:12px">These totals are only as complete as the data you have recorded.</p></section></div>`;
+    }
+    function renderSettings() {
+      return `${pageHeading('Settings','Update your profile, manage your data and check the connection.')}
+        <div class="grid grid-2"><section class="panel panel-pad"><div class="panel-head"><div><h2>Profile and preferences</h2><p>Personalise the information shown in your dashboard.</p></div></div><form class="stack" data-form="settings"><label>Display name<input name="name" maxlength="70" value="${esc(state.profile.name)}" placeholder="What should SmartSave call you?"></label><label>Currency for display<select name="currency">${['INR','USD','GBP','EUR','AUD','CAD','SGD'].map(c=>`<option value="${c}" ${state.settings.currency===c?'selected':''}>${c}</option>`).join('')}</select></label><button class="btn btn-primary" type="submit">Save preferences</button></form>
+        <div class="settings-block"><h3>Local account</h3><div class="auth-state-row"><div><strong style="font-size:12px">Mode</strong><div class="small muted">${appMode==='demo'?'Sample demo account':'Local account'} · saved in this browser only</div></div><span class="pill amber">Local only</span></div><div class="auth-state-row"><div><strong style="font-size:12px">Account email</strong><div class="small muted">${esc(currentUser?.email||'')}</div></div><button class="btn btn-ghost btn-sm" type="button" data-act="signout">Sign out</button></div><p class="small muted" style="margin-top:10px">This login is only a project demo. It does not protect data from someone who can access this browser and cannot sync data to another device.</p><button class="btn btn-soft" type="button" data-act="auth-screen">Switch account</button></div></section>
+        <section class="panel panel-pad"><div class="panel-head"><div><h2>Your data</h2><p>Keep a backup of your records when making changes.</p></div></div>
+          <div class="settings-block"><h3>Export a backup</h3><p>Download a JSON copy of your SmartSave app data.</p><button class="btn btn-soft" type="button" data-act="export">↓ Export backup</button></div>
+          <div class="settings-block"><h3>Import a backup</h3><p>Restore a backup JSON file. This replaces current app data after validation.</p><label>Choose backup file<input id="importFile" type="file" accept="application/json,.json"></label></div>
+          <div class="settings-block"><h3>Reset app data</h3><p>Clear transactions, goals, lesson progress and virtual portfolio for this account/browser.</p><button class="btn btn-danger" type="button" data-act="reset-data">Reset all app data</button></div>
+          <div class="notice warn" style="margin-top:18px"><span>💾</span><p>Local-only storage: SmartSave saves your account and records in this browser. Clearing website data may erase them. Export a backup regularly and never use a real/private password for this demo login.</p></div>
+        </section></div>`;
+    }
+
+    /* =========================================================
+       7. ACTIONS + FORM HANDLERS
+       ========================================================= */
+    function addXp(amount, reason) { state.xp += amount; showToast(`+${amount} XP · ${reason}`); }
+    function handleClick(event) {
+      const nav = event.target.closest('[data-view]');
+      if (nav) { goTo(nav.dataset.view); return; }
+      const button = event.target.closest('[data-act]');
+      if (!button) return;
+      const {act,id} = button.dataset;
+      if (act === 'delete-tx') {
+        const item = state.transactions.find(t=>t.id===id);
+        if (item && confirm(`Delete “${item.note || item.category}” (${money(item.amount)})?`)) { state.transactions = state.transactions.filter(t=>t.id!==id); persistState(); renderPage(); showToast('Transaction deleted.'); }
+      } else if (act === 'delete-goal') {
+        if (confirm('Remove this savings goal? Its record will be removed from SmartSave.')) { state.goals = state.goals.filter(g=>g.id!==id); persistState(); renderPage(); showToast('Goal removed.'); }
+      } else if (act === 'open-lesson') openLesson(id);
+      else if (act === 'close-modal') closeModal();
+      else if (act === 'complete-lesson') {
+        const lesson = LESSONS.find(l => l.id === id);
+        if (lesson && !state.completedLessons.includes(id)) {
+          state.completedLessons.push(id); addXp(20, 'Lesson completed'); persistState(); closeModal(); renderPage();
+        }
+      }
+      else if (act === 'complete-challenge') completeChallenge(id);
+      else if (act === 'trade') performTrade(id,button.dataset.type);
+      else if (act === 'reset-sim') resetSimulator();
+      else if (act === 'export') exportBackup();
+      else if (act === 'reset-data') resetData();
+      else if (act === 'signout') exitSession();
+      else if (act === 'auth-screen') showSignedOut();
+    }
+    function openLesson(id) {
+      const lesson = LESSONS.find(l=>l.id===id); if (!lesson) return;
+      const already = state.completedLessons.includes(id);
+      const root = $('#modalRoot');
+      root.innerHTML = `<div class="modal-backdrop"><section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="lessonModalTitle"><div class="goal-card-top"><span class="card-emoji">${lesson.icon}</span><span class="pill ${already?'green':''}">${already?'✓ Completed':`${lesson.minutes} min · ${lesson.level}`}</span></div><h2 id="lessonModalTitle">${esc(lesson.title)}</h2><p class="muted" style="margin:0 0 15px;font-size:13px">${esc(lesson.desc)}</p><div class="lesson-body">${esc(lesson.body)}</div><div class="modal-actions"><button class="btn btn-ghost" type="button" data-act="close-modal">Close</button>${already?'':`<button class="btn btn-primary" type="button" data-act="complete-lesson" data-id="${lesson.id}">Mark complete · +20 XP</button>`}</div></section></div>`;
+      root.classList.remove('hidden');
+      root.onclick = event => { if (event.target.classList.contains('modal-backdrop')) closeModal(); };
+      const close = $('[data-act="close-modal"]',root); if (close) close.focus();
+    }
+    function closeModal() { const root = $('#modalRoot'); root.classList.add('hidden'); root.innerHTML = ''; root.onclick = null; }
+    function completeChallenge(id) {
+      const item = CHALLENGES.find(c=>c.id===id); if (!item || state.completedChallenges.includes(id)) return;
+      if (!confirm(`${item.title}\n\n${item.desc}\n\nHave you completed this habit?`)) return;
+      state.completedChallenges.push(id); addXp(item.xp,'Challenge completed'); persistState(); renderPage();
+    }
+    function performTrade(assetId,type) {
+      const asset = ASSETS.find(a=>a.id===assetId); if (!asset || !['buy','sell'].includes(type)) return;
+      const currentUnits = Number(state.simulator.holdings[assetId]||0);
+      const action = type==='buy'?'Buy':'Sell';
+      const raw = prompt(`${action} ${asset.name}\nFixed practice price: ${money(asset.price)} per unit\n${type==='buy'?`Virtual cash available: ${money(state.simulator.cash)}`:`Units you hold: ${currentUnits.toFixed(2)}`}\n\nEnter number of units (up to 2 decimal places):`, '1');
+      if (raw===null) return;
+      const units = Number(raw);
+      if (!Number.isFinite(units) || units<=0 || units>1000000 || Math.abs(Math.round(units*100)-units*100)>1e-8) { showToast('Enter a positive number of units with at most 2 decimal places.'); return; }
+      const cost = units*asset.price;
+      if (type==='buy') {
+        if (cost > state.simulator.cash) { showToast('Not enough virtual cash for that trade.'); return; }
+        state.simulator.cash -= cost; state.simulator.holdings[assetId] = currentUnits+units;
+      } else {
+        if (units > currentUnits) { showToast('You cannot sell more units than you hold.'); return; }
+        state.simulator.cash += cost; state.simulator.holdings[assetId] = Math.max(0,currentUnits-units);
+      }
+      state.simulator.trades.push({id:uid(),type,asset:assetId,units,date:localDate()});
+      persistState(); renderPage(); showToast(`Virtual ${type} recorded. No real money was used.`);
+    }
+    function resetSimulator() {
+      if (!confirm('Reset only the virtual simulator? Your transactions, goals and lessons will stay.')) return;
+      state.simulator = {cash:50000,holdings:{},trades:[]}; persistState(); renderPage(); showToast('Virtual portfolio reset.');
+    }
+    function exportBackup() {
+      const payload = {app:'SmartSave',formatVersion:2,exportedAt:new Date().toISOString(),data:state};
+      const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+      const url = URL.createObjectURL(blob); const link = document.createElement('a');
+      link.href = url; link.download = `smartsave-backup-${localDate()}.json`; document.body.appendChild(link); link.click(); link.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+      showToast('Backup exported. Store it somewhere private.');
+    }
+    async function resetData() {
+      if (!confirm('This clears all SmartSave transactions, goals, progress, and virtual trades for the current account/browser. Export a backup first if needed. Continue?')) return;
+      const name = state.profile.name; state = blankState(); state.profile.name = name;
+      persistState(); renderPage();
+      showToast('App data reset for this local account.');
+    }
+    async function importBackup(file) {
+      if (!file) return;
+      if (file.size > 5*1024*1024) { showToast('Backup file is too large (maximum 5 MB).'); return; }
+      try {
+        const raw = JSON.parse(await file.text());
+        const payload = raw?.app==='SmartSave' ? raw.data : raw;
+        if (!payload || !Array.isArray(payload.transactions) || !Array.isArray(payload.goals)) throw new Error('This does not look like a SmartSave backup.');
+        if (!confirm('Importing will replace your current SmartSave data. Continue?')) return;
+        state = normaliseState(payload); persistState(); renderShell(); showToast('Backup imported and validated.');
+      } catch(error) { showToast(error.message || 'Could not import that backup.'); }
+      finally { const input = $('#importFile'); if (input) input.value=''; }
+    }
+
+    function formObject(form) { return Object.fromEntries(new FormData(form).entries()); }
+    function validAmount(value,min=0,max=100000000) { const n=Number(value); return Number.isFinite(n) && n>=min && n<=max; }
+    function handleFormSubmit(event) {
+      const form = event.target.closest('form[data-form]'); if (!form) return;
+      event.preventDefault(); const data = formObject(form);
+      switch(form.dataset.form) {
+        case 'transaction': {
+          const amount=Number(data.amount);
+          if (!validAmount(amount,.01)) { showToast('Enter a positive transaction amount.'); return; }
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(data.date) || data.date>localDate()) { showToast('Choose a valid date that is not in the future.'); return; }
+          const category = data.type==='income' ? 'Income' : (CATEGORIES.includes(data.category)?data.category:'Other');
+          state.transactions.push({id:uid(),type:data.type==='income'?'income':'expense',amount,category,note:String(data.note||'').trim().slice(0,120),date:data.date});
+          persistState(); renderPage(); showToast('Transaction saved.'); break;
+        }
+        case 'budget-limit': {
+          if (!CATEGORIES.includes(data.category)||!validAmount(data.limit,0)) { showToast('Enter a valid budget limit.'); return; }
+          state.budgets[data.category]=Number(data.limit); persistState(); renderPage(); showToast(`${data.category} budget updated.`); break;
+        }
+        case 'monthly-plan': {
+          if (!validAmount(data.income,0)||!validAmount(data.budget,0)) { showToast('Enter valid monthly amounts.'); return; }
+          state.settings.monthlyIncome=Number(data.income); state.settings.monthlyBudget=Number(data.budget); persistState(); renderPage(); showToast('Monthly plan saved.'); break;
+        }
+        case 'goal-create': {
+          const target=Number(data.target), saved=Number(data.saved||0);
+          if (!String(data.name||'').trim()||!validAmount(target,1)||!validAmount(saved,0)) { showToast('Enter a goal name and valid amounts.'); return; }
+          if (data.deadline && (!/^\d{4}-\d{2}-\d{2}$/.test(data.deadline)||data.deadline<localDate())) { showToast('Choose a target date today or later.'); return; }
+          state.goals.push({id:uid(),name:data.name.trim().slice(0,70),target,saved,deadline:data.deadline||''}); persistState(); renderPage(); showToast('Savings goal created.'); break;
+        }
+        case 'contribute': {
+          const goal=state.goals.find(g=>g.id===data.id), amount=Number(data.amount);
+          if (!goal||!validAmount(amount,1)) { showToast('Enter a valid amount to add.'); return; }
+          goal.saved+=amount; persistState(); renderPage(); showToast(`Added ${money(amount)} to ${goal.name}.`); break;
+        }
+        case 'settings': {
+          if (!['INR','USD','GBP','EUR','AUD','CAD','SGD'].includes(data.currency)) { showToast('Choose a valid currency.'); return; }
+          state.profile.name=String(data.name||'').trim().slice(0,70); state.settings.currency=data.currency;
+          persistState(); renderShell(); showToast('Preferences saved.'); break;
+        }
+        case 'compound': {
+          const p=Number(data.principal),r=Number(data.rate),y=Number(data.years);
+          if(!validAmount(p,0)||!validAmount(r,0,100)||!Number.isInteger(y)||y<1||y>80){showToast('Check your amount, rate (0–100%) and years (1–80).');return;}
+          const result=p*Math.pow(1+r/100,y); const node=$('#compoundResult');
+          node.innerHTML=`<span class="eyebrow">Estimated final amount</span><strong>${money(result)}</strong><div class="small muted">Illustrative only; interest rate remains fixed in this estimate. Taxes, fees, inflation and product terms are not included.</div>`; break;
+        }
+        case 'emergency': {
+          const costs=Number(data.costs),months=Number(data.months),saved=Number(data.saved);
+          if(!validAmount(costs,0)||!validAmount(saved,0)||![1,3,6].includes(months)){showToast('Enter valid monthly costs and savings.');return;}
+          const target=costs*months,remaining=Math.max(0,target-saved);
+          $('#emergencyResult').innerHTML=`<span class="eyebrow">Target amount</span><strong>${money(target)}</strong><div class="small muted">${money(remaining)} more to reach this example target, based on the values you entered.</div>`; break;
+        }
+        case 'goalcalc': {
+          const target=Number(data.target),saved=Number(data.saved),months=Number(data.months);
+          if(!validAmount(target,1)||!validAmount(saved,0)||!Number.isInteger(months)||months<1||months>600){showToast('Enter valid amounts and 1–600 months.');return;}
+          const monthly=Math.max(0,target-saved)/months;
+          $('#goalCalcResult').innerHTML=`<span class="eyebrow">Monthly pace needed</span><strong>${money(monthly)}</strong><div class="small muted">Assumes no interest or investment returns. If already saved exceeds the target, the amount is zero.</div>`; break;
+        }
+        case 'split': {
+          const income=Number(data.income); if(!validAmount(income,0)){showToast('Enter a valid take-home income.');return;}
+          const parts=[['Needs · 50%',.5,'#4baf7d'],['Wants · 30%',.3,'#6d95d1'],['Savings/debt · 20%',.2,'#dfb653']];
+          $('#splitResult').innerHTML=parts.map(([label,pct,color])=>`<div class="budget-row"><div class="budget-row-top"><strong>${label}</strong><span>${money(income*pct)}</span></div><div class="progress-track"><div class="progress-fill" style="width:${pct*100}%;background:${color}"></div></div></div>`).join('')+'<p class="small muted">The 50/30/20 split is one example. Your needs, obligations and income may call for a different plan.</p>'; break;
+        }
+      }
+    }
+
+    /* =========================================================
+       8. EVENT LISTENERS + BOOT
+       ========================================================= */
+    $('#tabLogin').addEventListener('click',()=>{authMode='login';renderAuthMode();});
+    $('#tabSignup').addEventListener('click',()=>{authMode='signup';renderAuthMode();});
+    $('#authForm').addEventListener('submit',handleAuthSubmit);
+    $('#demoButton').addEventListener('click', continueWithDemo);
+    $('#sidebarExit').addEventListener('click',exitSession);
+    document.addEventListener('keydown',event=>{ if(event.key==='Escape' && !$('#modalRoot').classList.contains('hidden')) closeModal(); });
+    $('#appShell').addEventListener('click',handleClick);
+    $('#appShell').addEventListener('submit',handleFormSubmit);
+    $('#appShell').addEventListener('change',event=>{
+      if(event.target.id==='transactionFilter'){transactionFilter=event.target.value;renderPage();}
+      if(event.target.id==='importFile'&&event.target.files?.[0]) importBackup(event.target.files[0]);
+      if(event.target.name==='type' && event.target.form?.dataset.form==='transaction') {
+        const categorySelect=event.target.form.querySelector('[name="category"]');
+        [...categorySelect.options].forEach(option=>{ option.hidden = event.target.value==='income' ? option.value!=='Income' : option.value==='Income'; });
+        categorySelect.value = event.target.value==='income' ? 'Income' : 'Food';
+      }
+    });
+
+    async function boot() {
+      // Set up the visible sample account without a server or external service.
+      await ensureDemoAccount();
+      renderAuthMode();
+      showSignedOut();
+    }
+    renderAuthMode();
+    boot().catch(error => {
+      console.error('SmartSave initialisation failed:', error);
+      showAuthAlert('SmartSave could not initialise local accounts. Enable browser storage and refresh.', 'error');
+    });
+  </script>
+</body>
+</html>
